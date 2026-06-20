@@ -1,16 +1,18 @@
-"""Generate play_badge.png — a two-tone 'Play' badge for the README and concept doc.
+"""Generate play_badge.png — a rounded-pill 'Play' badge for the README and concept doc.
 Run:  python make_badge.py
 """
+import os
 from PIL import Image, ImageDraw, ImageFont
 
-S = 2                      # supersample factor for crisp text
-H = 32 * S                 # badge height
-PAD = 11 * S               # horizontal text padding
-GAP = 8 * S                # gap between play-triangle and PLAY text
-RADIUS = 6 * S
-GRAY = (85, 90, 100)       # left segment
-VIOLET = (109, 40, 217)    # right segment (#6D28D9)
-WHITE = (255, 255, 255)
+S = 3                      # supersample factor for crisp edges
+H = 34 * S                 # badge height
+PAD = 16 * S               # horizontal text padding
+GAP = 9 * S                # gap between play-triangle and PLAY text
+GRAY = (85, 90, 100, 255)  # left segment
+VIOLET = (109, 40, 217, 255)  # right segment (#6D28D9)
+WHITE = (255, 255, 255, 255)
+TRANSP = (0, 0, 0, 0)
+RADIUS = H // 2            # full pill rounding
 
 LEFT = "PLAY"
 RIGHT = "AGENT FACTORY TYCOON"
@@ -29,22 +31,23 @@ def tw(s):
     b = fnt.getbbox(s)
     return b[2] - b[0]
 
-tri_w = 10 * S
+tri_w = 11 * S
 left_w = PAD + tri_w + GAP + tw(LEFT) + PAD
 right_w = PAD + tw(RIGHT) + PAD
 W = left_w + right_w
 
-img = Image.new("RGB", (W, H), VIOLET)
+img = Image.new("RGBA", (W, H), TRANSP)
 d = ImageDraw.Draw(img)
-# rounded full bg (violet), then gray left with rounded left corners
+# full violet pill (transparent corners), then gray left segment with a pill-rounded
+# left end and a straight seam at left_w.
 d.rounded_rectangle([0, 0, W - 1, H - 1], radius=RADIUS, fill=VIOLET)
-d.rounded_rectangle([0, 0, left_w + RADIUS, H - 1], radius=RADIUS, fill=GRAY)
-d.rectangle([left_w, 0, left_w + RADIUS, H - 1], fill=VIOLET)  # square off the seam
+d.rounded_rectangle([0, 0, left_w - 1, H - 1], radius=RADIUS, fill=GRAY)
+d.rectangle([left_w - RADIUS, 0, left_w, H - 1], fill=GRAY)  # straighten the seam
 
-# play triangle
+# play triangle (vertically centred)
 ty = H / 2
 tx = PAD
-d.polygon([(tx, ty - 6 * S), (tx, ty + 6 * S), (tx + tri_w, ty)], fill=WHITE)
+d.polygon([(tx, ty - 7 * S), (tx, ty + 7 * S), (tx + tri_w, ty)], fill=WHITE)
 
 def vtext(x, s):
     b = fnt.getbbox(s)
@@ -55,5 +58,6 @@ vtext(PAD + tri_w + GAP, LEFT)
 vtext(left_w + PAD, RIGHT)
 
 img = img.resize((W // S, H // S), Image.LANCZOS)
-img.save("play_badge.png")
-print(f"Wrote play_badge.png  ({img.width}x{img.height})")
+out = os.path.join(os.path.dirname(os.path.abspath(__file__)), "play_badge.png")
+img.save(out)
+print(f"Wrote {out}  ({img.width}x{img.height})")
