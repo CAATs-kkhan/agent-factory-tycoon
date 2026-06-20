@@ -1,0 +1,7 @@
+# Stray / unrelated files that should not be published
+Lecture 3 Task.pdf
+
+# OS clutter
+.DS_Store
+Thumbs.db
+desktop.ini

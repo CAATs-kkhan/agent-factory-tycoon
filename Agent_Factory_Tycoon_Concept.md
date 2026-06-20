@@ -1317,6 +1317,69 @@ If these targets are met, the assemble → spec → verify loop is proven and th
 
 ---
 
+# Part 11 — GitHub Sync & Deployment
+
+The playable prototype and this design document are version-controlled on GitHub and published as a live, in-browser game via GitHub Pages.
+
+## Live Links
+
+| Resource | URL |
+|----------|-----|
+| Play the game (GitHub Pages) | https://caats-kkhan.github.io/agent-factory-tycoon/ |
+| Source repository | https://github.com/CAATs-kkhan/agent-factory-tycoon |
+
+The repository contains the playable `index.html`, this design document (`.md`, `.docx`, `.pdf`), and the `README.md`.
+
+## One-Time Setup (how it was synced)
+
+Prerequisites: Git and the GitHub CLI (`gh`) installed, and `gh auth login` completed.
+
+1. **Initialize the repo** (run from inside the game folder):
+
+   ```bash
+   git init
+   git add -A
+   git commit -m "Agent Factory Tycoon: playable prototype + design docs"
+   git branch -M main
+   ```
+
+2. **Create the GitHub repo and push** (the GitHub CLI creates it and pushes in one step):
+
+   ```bash
+   gh repo create agent-factory-tycoon --public --source=. --remote=origin --push
+   ```
+
+3. **Enable GitHub Pages** (serves the game from the `main` branch root):
+
+   ```bash
+   gh api -X POST repos/CAATs-kkhan/agent-factory-tycoon/pages \
+     -f "source[branch]=main" -f "source[path]=/"
+   ```
+
+   After about 1–2 minutes the game is live at the Pages URL above. Verify the build with:
+
+   ```bash
+   gh api repos/CAATs-kkhan/agent-factory-tycoon/pages/builds/latest --jq .status
+   ```
+
+## Update Workflow (for every future change)
+
+After editing `index.html` (or any file), publish the change:
+
+```bash
+git add -A
+git commit -m "describe your change"
+git push
+```
+
+GitHub Pages automatically rebuilds within about 1–2 minutes. Hard-refresh the live page (`Ctrl + F5`) to bypass the browser cache and see the update.
+
+## Regenerating the Documents
+
+If the design document Markdown changes, rebuild the `.docx` and `.pdf` (see the README for the exact commands), then commit and push them alongside the source so the repository stays in sync.
+
+---
+
 # Sources
 
 - The Agent Factory Thesis — <https://agentfactory.panaversity.org/docs/thesis>
