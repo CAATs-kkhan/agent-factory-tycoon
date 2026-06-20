@@ -10,6 +10,10 @@
 
 **An educational game concept that teaches Agentic AI, Digital FTEs, and Spec-Driven Development through play.**
 
+### ▶ [Play the game online](https://caats-kkhan.github.io/agent-factory-tycoon/) — runs in any browser, no install
+
+[![Play Agent Factory Tycoon](https://img.shields.io/badge/▶%20Play-Agent%20Factory%20Tycoon-6D28D9?style=for-the-badge)](https://caats-kkhan.github.io/agent-factory-tycoon/)
+
 Based on the AgentFactory live book — <https://agentfactory.panaversity.org/docs>
 
 ---
