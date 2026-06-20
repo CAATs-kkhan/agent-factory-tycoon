@@ -69,6 +69,8 @@ Nova guides every step. Coins and XP carry across all **26 levels** (L1 → … 
 
 **Level Select:** the start screen has a **📋 Level Select** button — tap it to jump straight to any of the 26 levels.
 
+**Saved progress:** coins, XP, and completed levels are saved automatically in your browser (localStorage), so they persist between sessions. The Level Select grid shows a ✓ on completed levels and a running total; a **⟲ Reset** button there clears your progress.
+
 ## What's Inside the Document
 
 - **Executive Summary** — the one-page pitch.

@@ -167,6 +167,8 @@
   .lvlcell:active{transform:translateY(2px);}
   .lvlcell .num{font-weight:800; color:var(--violet); font-size:16px;}
   .lvlcell .nm{font-size:9px; color:#64748b; line-height:1.15; display:block; margin-top:2px;}
+  .lvlcell.done{background:#f0fdf4; box-shadow:0 3px 0 #86efac;}
+  .lvlcell.done .num{color:var(--green);}
   .logo{font-size:46px;}
   small.note{display:block; text-align:center; color:#94a3b8; font-size:11px; margin-top:6px;}
 </style>
@@ -198,9 +200,13 @@
     <!-- LEVEL SELECT -->
     <section id="scene-select" class="scene">
       <h2 class="title">LEVEL SELECT</h2>
-      <p style="text-align:center;color:#475569;font-size:13px;margin:2px 0;">Jump straight to any level.</p>
+      <p style="text-align:center;color:#475569;font-size:13px;margin:2px 0;">Jump straight to any level. ✓ = completed.</p>
+      <p id="selProgress" style="text-align:center;color:var(--violet);font-size:12px;font-weight:700;margin:2px 0;"></p>
       <div id="levelGrid" class="lvlgrid"></div>
-      <button class="btn" onclick="show('scene-start')" style="background:#94a3b8;box-shadow:0 4px 0 #64748b;">← Back</button>
+      <div class="btn-row">
+        <button class="btn" onclick="show('scene-start')" style="background:#94a3b8;box-shadow:0 4px 0 #64748b;">← Back</button>
+        <button class="btn" onclick="resetProgress()" style="background:#ef4444;box-shadow:0 4px 0 #b91c1c;">⟲ Reset</button>
+      </div>
     </section>
 
     <!-- BUILD -->
@@ -433,10 +439,11 @@ const sfx={
 };
 
 /* ---------- helpers ---------- */
-function show(id){document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');}
+function show(id){document.querySelectorAll('.scene').forEach(s=>s.classList.remove('active'));document.getElementById(id).classList.add('active');if(id==='scene-reward'||id==='scene-reward2'||id==='scene-rewardN'){markDone(currentLevel);}}
 function nova(txt,happy){document.getElementById('novaSay').textContent=txt;document.getElementById('orb').classList.toggle('happy',!!happy);}
 let coins=0,xp=0;
-function setStats(){document.getElementById('coins').textContent=coins;document.getElementById('xp').textContent=xp;}
+function setStats(){document.getElementById('coins').textContent=coins;document.getElementById('xp').textContent=xp;persist();}
+let currentLevel=1;
 function sparkle(el){
   const r=el.getBoundingClientRect();
   for(let i=0;i<6;i++){
@@ -457,7 +464,7 @@ function confetti(){
 }
 
 /* ---------- flow ---------- */
-function startGame(){if(!actx){try{actx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}buildInit();show('scene-build');}
+function startGame(){if(!actx){try{actx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}setLevelTitle('LEVEL 1 — Your First Hire');buildInit();show('scene-build');}
 
 /* ----- BUILD ----- */
 const PARTS=[
@@ -623,7 +630,7 @@ function approve(){
 }
 
 /* ----- REWARD ----- */
-function setLevelTitle(t){document.getElementById('lvlTitle').textContent=t;}
+function setLevelTitle(t){document.getElementById('lvlTitle').textContent=t;const m=t.match(/LEVEL (\d+)/);if(m)currentLevel=+m[1];}
 function playAgain(){
   setLevelTitle('LEVEL 1 — Your First Hire');
   nova('On to a fresh run! Same loop — build, spec, go, verify. 🚀');
@@ -1142,15 +1149,26 @@ function gotoLevel(n){
 function showSelect(){
   if(!actx){try{actx=new(window.AudioContext||window.webkitAudioContext)()}catch(e){}}
   const g=document.getElementById('levelGrid');g.innerHTML='';
+  let dc=0;
   for(let n=1;n<=26;n++){
-    const b=document.createElement('button');b.className='lvlcell';
-    b.innerHTML='<span class="num">'+n+'</span><span class="nm">'+LEVEL_NAMES[n]+'</span>';
+    const isDone=!!(save.done&&save.done[n]);if(isDone)dc++;
+    const b=document.createElement('button');b.className='lvlcell'+(isDone?' done':'');
+    b.innerHTML='<span class="num">'+(isDone?'✓ ':'')+n+'</span><span class="nm">'+LEVEL_NAMES[n]+'</span>';
     b.onclick=()=>gotoLevel(n);
     g.appendChild(b);
   }
+  document.getElementById('selProgress').textContent=dc+' / 26 completed   ·   🪙 '+coins+'   ·   ⭐ '+xp;
   show('scene-select');
 }
-setStats();
+
+/* ====== SAVE / LOAD (localStorage) ====== */
+const SAVE_KEY='aft_save_v1';
+let save={coins:0,xp:0,done:{}};
+function persist(){save.coins=coins;save.xp=xp;try{localStorage.setItem(SAVE_KEY,JSON.stringify(save));}catch(e){}}
+function loadSave(){try{const s=JSON.parse(localStorage.getItem(SAVE_KEY));if(s&&typeof s==='object'){save={coins:s.coins||0,xp:s.xp||0,done:s.done||{}};coins=save.coins;xp=save.xp;}}catch(e){}}
+function markDone(n){if(!n)return;if(!save.done)save.done={};save.done[n]=true;persist();}
+function resetProgress(){if(typeof confirm==='function'&&!confirm('Reset all progress — coins, XP and completed levels?'))return;save={coins:0,xp:0,done:{}};coins=0;xp=0;try{localStorage.removeItem(SAVE_KEY);}catch(e){}setStats();nova('Progress reset — fresh start! 🔄');showSelect();}
+loadSave();setStats();
 </script>
 </body>
 </html>
