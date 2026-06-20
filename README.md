@@ -1,5 +1,9 @@
 # Game_Agentfactory
 
+### ▶ [**Play online now**](https://caats-kkhan.github.io/agent-factory-tycoon/) — no install, runs in your browser
+
+[![Play](https://img.shields.io/badge/▶%20Play-Agent%20Factory%20Tycoon-6D28D9?style=for-the-badge)](https://caats-kkhan.github.io/agent-factory-tycoon/)
+
 Game design documents for **Agent Factory Tycoon** — a cozy, mobile-first educational game that teaches Agentic AI, Digital FTEs, and Spec-Driven Development through play. Based on the AgentFactory live book (Panaversity): <https://agentfactory.panaversity.org/docs>
 
 ## The Idea (one line)
